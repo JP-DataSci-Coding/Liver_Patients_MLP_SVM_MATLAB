@@ -1,0 +1,42 @@
+clear all; close all;
+
+rng default;
+
+%% ----- Loading Data -----
+
+liverPatient_data = load('LiverPatientData.mat');
+
+liverPatientData = liverPatient_data.liverPatientData;
+
+input = liverPatientData(:, 1:10);
+target = liverPatientData(:, 11);
+
+% Test percentage split:
+p = 0.7;
+
+[m, n] = size(input);
+[r, c] = size(target);
+
+shuffled_idx = randperm(m);
+
+train_x = input(shuffled_idx(1:round(p * m)), :); 
+train_y = target(shuffled_idx(1:round(p * r)), :);
+
+test_x = input(shuffled_idx(round(p * m) + 1:end), :);
+test_y = target(shuffled_idx(round(p * r) + 1:end), :);
+
+%% ----- Original SVM -----
+
+SVMModel = fitcsvm(X,y,'KernelFunction','rbf', 'KernelScale',sigmaOpts,...
+    'BoxConstraint', boxOpts, 'ClassNames', {'0','1'})
+
+%% ----- SMOTE SVM -----
+
+
+
+%% ----- Bayes Opt SVM -----
+
+svm_bayesOpt = fitcsvm(train_x, train_y, 'KernelFunction','linear',...
+    'OptimizeHyperparameters','auto',...
+    'HyperparameterOptimizationOptions',struct('AcquisitionFunctionName',...
+    'expected-improvement'))
